@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myproject-app
+  labels:
+    name: myproject-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      name: myproject-app
+  template:
+    metadata:
+      labels:
+        name: myproject-app
+    spec:
+      imagePullSecrets:
+        - name: dockerhub
+      containers:
+      - name: myproject-app
+        image: myusername/myproject:1.0.0-app
+        ports:
+          - containerPort: 5000
+        volumeMounts:
+          - name: etc-myproject
+            mountPath: /etc/myproject
+      volumes:
+        - name: etc-myproject
+          secret:
+            secretName: etc-myproject-YYYYMMDDhhmmss
+            items:
+              - key: secret.txt
+                path: secret.txt
+              - key: settings.conf
+                path: settings.conf
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-myproject-app
+  labels:
+    name: web
+spec:
+  ports:
+    - port: 5000
+  selector:
+    name: myproject-app

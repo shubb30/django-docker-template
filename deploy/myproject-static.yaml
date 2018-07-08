@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myproject-static
+  labels:
+    name: myproject-static
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      name: myproject-static
+  template:
+    metadata:
+      labels:
+        name: myproject-static
+    spec:
+      imagePullSecrets:
+        - name: dockerhub
+      containers:
+      - name: myproject-static
+        image: myusername/myproject:1.0.0-static
+        ports:
+          - containerPort: 80
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-myproject-static
+  labels:
+    name: web
+spec:
+  ports:
+    - port: 80
+  selector:
+    name: myproject-static
