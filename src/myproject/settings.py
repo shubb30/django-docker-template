@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
 import os
-from secret_gen import get_secret
+from secret_gen import get_secret, generate_random_string
 from config_mgmt import config_gen
 
 CONF_LOCATION = "/etc/path/to/settings.conf"
@@ -27,14 +27,27 @@ except Exception as e:
 
 CONFIG = CONFIG_gen(CONF_LOCATION, EXAMPLE_CONF_LOCATION)
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_LOCATION = CONFIG.get('general', 'SECRET_LOCATION')
-SECRET_KEY = get_secret(SECRET_LOCATION)
+""" SECURITY WARNING: keep the secret key used in production secret!
+    Check for a config value for secret_location for a file containing
+    a secret.  If the setting is not present, check for a setting
+    for secret.  Otherwise, generate a secret and save it to the 
+    config file.
+"""
+if CONFIG.has_option('django', 'secret_location'):
+    SECRET_LOCATION = CONFIG.get('general', 'secret_location')
+    SECRET_KEY = get_secret(SECRET_LOCATION)
+elif CONFIG.has_option('django', 'secret'):
+    SECRET_KEY = config.get('django', 'secret')
+else:
+    SECRET_KEY = generate_random_string()
+    CONFIG.set('django', 'secret', SECRET_KEY)
+    with open(CONF_LOCATION, 'w') as fh:
+        CONFIG.write(fh)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = CONFIG.getboolean('django', 'debug')
 
-ALLOWED_HOSTS = CONFIG.get('general', 'allowed_hosts').split(',')
+ALLOWED_HOSTS = CONFIG.get('django', 'allowed_hosts').split(',')
 
 ADMINS = CONFIG.get('django', 'admins')
 

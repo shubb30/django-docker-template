@@ -34,7 +34,7 @@ def get_secret(location, num=50):
     return None
 
 
-def generate_random_string(num):
+def generate_random_string(num=50):
     import random
     alpha = 'abcdefghijklmnopqrstuvwxyz'
     numbers = '0123456789'

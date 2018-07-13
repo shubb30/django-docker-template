@@ -1,9 +1,11 @@
 [general]
-allowed_hosts:www.mywebsite.example
-secret_location:/etc/path/to/secret.txt
 environment:dev
 
 [django]
+allowed_hosts:www.mywebsite.example
+# uncomment either secret_location, or secret and supply your own value
+#secret_location:/etc/path/to/secret.txt
+#secret:generate-your-own-secret-here
 apps:myapp
 language_code:en-us
 timezone:America/Los_Angeles
